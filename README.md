@@ -100,7 +100,10 @@ Topic: topic2	PartitionCount: 3	ReplicationFactor: 3
 ```
 
 ## Kafka Producer Setup
-Ensure the producer is correctly configured before publishing messages.
+```sh
+./bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic product-created-events-topic --property "parse.key=true" --propert
+y "key.separator=:"
+```
 
 ## Kafka Consumer Setup
 ### Basic Consumer Command
