@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -36,7 +37,14 @@ public class KafkaConsumerConfig {
         Map<String, Object> config= new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, CONSUMER_BOOTSTRAP_SERVER);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+        /**
+         * In order to handle deserializer error at the run time we can not use this class
+         * and we would be using ErrorHandlingDeserializer class
+         * config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+         */
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, CONSUMER_GROUP_ID);
         config.put(JsonDeserializer.TRUSTED_PACKAGES, JSON_TRUSTED_PACKAGES);
         return new DefaultKafkaConsumerFactory<>(config);
