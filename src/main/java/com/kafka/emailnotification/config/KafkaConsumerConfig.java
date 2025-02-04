@@ -1,5 +1,7 @@
 package com.kafka.emailnotification.config;
 
+import com.kafka.emailnotification.exception.NonRetryableException;
+import com.kafka.emailnotification.exception.RetryableException;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -14,6 +16,7 @@ import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,8 +84,19 @@ public class KafkaConsumerConfig {
          *  For example: product-created-events-topic-dlt
          */
         DefaultErrorHandler defaultErrorHandler= new DefaultErrorHandler(
-                new DeadLetterPublishingRecoverer(kafkaTemplate)
+                new DeadLetterPublishingRecoverer(kafkaTemplate),
+                new FixedBackOff(5000, 3)
         );
+        /**
+         * This would handle Non-retryable exception
+         * and message would be sent to DLT
+         */
+        defaultErrorHandler.addNotRetryableExceptions(NonRetryableException.class);
+        /**
+         * This would handle Non-retryable exception
+         * and message would be sent to DLT
+         */
+        defaultErrorHandler.addRetryableExceptions(RetryableException.class);
 
         ConcurrentKafkaListenerContainerFactory<String, Object> factory=
                 new ConcurrentKafkaListenerContainerFactory<>();
