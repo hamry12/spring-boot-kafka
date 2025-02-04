@@ -28,7 +28,7 @@
      public void handle(ProductCreatedEvent productCreatedEvent){
          logger.info("Event Received {}", productCreatedEvent.getTitle());
 
-         String requestURL="http://localhost:8082";
+         String requestURL="http://localhost:8082/api/response/200";
          ResponseEntity<String> response=null;
          try{
              response=restTemplate.exchange(requestURL, HttpMethod.GET, null, String.class);
